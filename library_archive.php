@@ -25,7 +25,7 @@ $result = $mysqli->query($sql);
 <body style="width: 100%; min-height: 100vh; display: -webkit-box; display: -webkit-flex; display: -moz-box; display: -ms-flexbox; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; padding: 15px; background: #F4CABC;">
 	  <div class="container text-center" style="width: 1200px; background: #fff; border-radius: 10px; overflow: hidden; padding: 33px 55px 33px 55px; box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -moz-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -o-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -ms-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1);">
 	  	<h1 class="text-center display-4">Library Archive</h1>
-      <small class='text-muted pb-2'>Note: Entries are deleted 6 Months after their return date.</small>
+      <small class='text-muted pb-2'>Note: Entries 6 Months after their return date are not shown.</small>
       <br>
       <br>
 
@@ -70,7 +70,7 @@ elseif (array_key_exists('add', $_POST)) {
   }
 }
 
-$sql = "SELECT patronName, contactInfo, bookId, issueDate, dueDate, returnDate, fineAmountPaid FROM libraryarchive";
+$sql = "SELECT patronName, contactInfo, bookId, issueDate, dueDate, returnDate, fineAmountPaid FROM libraryarchive WHERE `returnDate` >= DATE_SUB(CURRENT_DATE, INTERVAL 6 MONTH)";
 $result = $mysqli->query($sql);
 
 if(!empty($result)) {
@@ -79,13 +79,13 @@ if ($result->num_rows > 0) {
   while($row = $result->fetch_assoc()) {
     $bookId = $row["bookId"];
     echo "<tr><td>". $row["patronName"] ."</td><td>". $row["contactInfo"] ."</td><td>". $bookId ."</td><td>". $row["issueDate"] ."</td><td>". $row["dueDate"] ."</td><td>". $row["returnDate"] ."</td><td> $" .$row["fineAmountPaid"] ."</td><td>
-    	<div class='btn-group' role='group'>
+        <div class='btn-group' role='group'>
 
       <form method='post'>
-    	<button id='add' name='add' class='btn btn-success btn-sm' value='$bookId'><i class='bi bi-plus-circle-fill'></i></button>
-			</form>
+        <button id='add' name='add' class='btn btn-success btn-sm' value='$bookId'><i class='bi bi-plus-circle-fill'></i></button>
+            </form>
 
-			&nbsp;
+            &nbsp;
 
       <form method='post'>
       <button id='delete' name='delete' class='btn btn-danger btn-sm' value='$bookId'><i class='bi bi-trash-fill'></i></button>
