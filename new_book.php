@@ -30,7 +30,11 @@ $bookId = strtoupper(preg_replace('/\s+/', '', trim(addslashes($_POST["bookId"])
 
 if ( isset($_FILES["file"]["type"]) && $_FILES["file"]["type"] != "" && !$check )
 {
+<<<<<<< HEAD
   $destination_directory = "/var/www/library.htor.org/images/books/";
+=======
+  $destination_directory = "C:/wamp64/www/htorbls/images/books/";
+>>>>>>> 53ddf2d6c3cb09f1628af6831206b9b0a8e0bc4e
   $validextensions = array("jpeg", "jpg", "png");
   $temporary = explode(".", $_FILES["file"]["name"]);
   $file_extension = end($temporary);

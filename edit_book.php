@@ -36,7 +36,11 @@ echo "<h2>Book Edit Results</h2>";
 
 if ( isset($_FILES["file"]["type"]) && $_FILES["file"]["type"] != ""  && !$check )
 {
+<<<<<<< HEAD
   $destination_directory = "/var/www/library.htor.org/images/books/";
+=======
+  $destination_directory = "C:/wamp64/www/htorbls/images/books/";
+>>>>>>> 53ddf2d6c3cb09f1628af6831206b9b0a8e0bc4e
   $validextensions = array("jpeg", "jpg", "png");
   $temporary = explode(".", $_FILES["file"]["name"]);
   $file_extension = end($temporary);
@@ -53,7 +57,11 @@ if ( isset($_FILES["file"]["type"]) && $_FILES["file"]["type"] != ""  && !$check
       }
       else
       {
+<<<<<<< HEAD
           $oldFilename = "/var/www/library.htor.org/images/books/" . $bookIdOld . ".jpeg";
+=======
+          $oldFilename = "C:/wamp64/www/htorbls/images/books/" . $bookIdOld . ".jpeg";
+>>>>>>> 53ddf2d6c3cb09f1628af6831206b9b0a8e0bc4e
           if(file_exists($oldFilename)){
             unlink($oldFilename);
           }
@@ -95,8 +103,13 @@ if ( isset($_FILES["file"]["type"]) && $_FILES["file"]["type"] != ""  && !$check
 }
 else if (!$check && $bookId != $bookIdOld) {
     // Handle renaming the existing image file when the book ID is changed
+<<<<<<< HEAD
     $oldImagePath = "/var/www/library.htor.org/images/books/" . $bookIdOld . ".jpeg";
     $newImagePath = "/var/www/library.htor.org/images/books/" . $bookId . ".jpeg";
+=======
+    $oldImagePath = "C:/wamp64/www/htorbls/images/books/" . $bookIdOld . ".jpeg";
+    $newImagePath = "C:/wamp64/www/htorbls/images/books/" . $bookId . ".jpeg";
+>>>>>>> 53ddf2d6c3cb09f1628af6831206b9b0a8e0bc4e
 
     // Check if an image exists for the old book ID
     if (file_exists($oldImagePath)) {
@@ -186,7 +199,11 @@ while($category = $categoryResult->fetch_assoc()) {
   <label id='imgCurrent' for='exampleInputFile' style='display: inline'><b>Current Image:</b></label>
   <label id='imgNew' for='exampleInputFile' style='display: none'><b>New Image:</b></label>
   <br>
+<<<<<<< HEAD
   <img id='previewImg' src='https://library.htor.org/images/books/$bookId.jpeg?rand=$random' style='max-height: 500px' class='rounded img-fluid'>
+=======
+  <img id='previewImg' src='http://library.htor.org/images/books/$bookId?rand=$random' style='max-height: 500px' class='rounded img-fluid'>
+>>>>>>> 53ddf2d6c3cb09f1628af6831206b9b0a8e0bc4e
 </div>
 
 <div class='mb-3 form-group'>

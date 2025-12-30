@@ -9,6 +9,10 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_username'])) {
     <div class="container text-center" style="width: 750px; background: #fff; border-radius: 10px; overflow: hidden; padding: 33px 55px 33px 55px; box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -moz-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -o-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -ms-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1);">
 <?php
 $bookId = addslashes($_GET["return"]);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 53ddf2d6c3cb09f1628af6831206b9b0a8e0bc4e
 if(array_key_exists('confirm', $_POST)) {
   $sql = "SELECT patronName, contactInfo, bookId, issueDate, dueDate, fineAmount FROM librarylog WHERE bookId = '$bookId'";
   $result = $mysqli->query($sql);
@@ -31,6 +35,10 @@ if(array_key_exists('confirm', $_POST)) {
       }
   }
 else {
+<<<<<<< HEAD
+=======
+
+>>>>>>> 53ddf2d6c3cb09f1628af6831206b9b0a8e0bc4e
 $sql = "SELECT fineAmount FROM librarylog WHERE bookId = '$bookId'";
 $result = $mysqli->query($sql) or die(mysqli_error($mysqli));
 if ($result->num_rows > 0) {
@@ -80,10 +88,17 @@ if ($result->num_rows > 0) {
       $contactInfo = $row['contactInfo'];
       $issueDate = $row['issueDate'];
       $dueDate = $row['dueDate'];
+<<<<<<< HEAD
         $sql = "INSERT INTO libraryarchive (patronName, contactInfo, bookId, issueDate, dueDate, returnDate, fineAmountPaid) VALUES ('$patronName', '$contactInfo', '$bookId', '$issueDate', '$dueDate', CURRENT_DATE, 0)";
           $result = $mysqli->query($sql);
           $sql = "DELETE FROM librarylog WHERE bookId = '$bookId'";
           $result = $mysqli->query($sql);
+=======
+        $sql = "INSERT INTO libraryarchive (patronName, contactInfo, bookId, issueDate, dueDate, returnDate, fineAmountPaid) VALUES ('$patronName', '$contactInfo', '$bookId', '$issueDate', '$dueDate', CURRENT_DATE, 0
+          $result = $mysqli->query($sql) or die(mysqli_error($mysqli));
+          $sql = "DELETE FROM librarylog WHERE bookId = '$bookId'";
+          $result = $mysqli->query($sql) or die(mysqli_error($mysqli));
+>>>>>>> 53ddf2d6c3cb09f1628af6831206b9b0a8e0bc4e
           echo "<h4>Item Returned</h4>";
           ?>
 <button onclick="window.location.href='./index.php';" id="showlog" name="showlog" class="btn btn-orange">Return Home</button>
@@ -149,4 +164,8 @@ function validateMoneyInput(input) {
 else {
   header("Location: login.php");
 }
+<<<<<<< HEAD
 ?>
+=======
+?>
+>>>>>>> 53ddf2d6c3cb09f1628af6831206b9b0a8e0bc4e

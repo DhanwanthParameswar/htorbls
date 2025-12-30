@@ -63,7 +63,11 @@ if(array_key_exists('delete', $_POST)) {
   $bookId = addslashes($_POST["delete"]);
   $sql = "DELETE FROM booklist WHERE bookId = '$bookId'";
   $result = $mysqli->query($sql) or die(mysqli_error($mysqli));
+<<<<<<< HEAD
   $filename = "/var/www/library.htor.org/images/books/" . $bookId . ".jpeg";
+=======
+  $filename = "C:/wamp64/www/htorbls/images/books/" . $bookId . ".jpeg";
+>>>>>>> 53ddf2d6c3cb09f1628af6831206b9b0a8e0bc4e
   if(file_exists($filename)){
     unlink($filename);
   }

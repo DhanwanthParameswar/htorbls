@@ -19,7 +19,11 @@ echo "<h2>Book Edit Results</h2>";
 
 if ( isset($_FILES["file"]["type"]) && $_FILES["file"]["type"] != "" )
 {
+<<<<<<< HEAD
   $destination_directory = "/var/www/library.htor.org/images/books/";
+=======
+  $destination_directory = "C:/wamp64/www/htorbls/images/books/";
+>>>>>>> 53ddf2d6c3cb09f1628af6831206b9b0a8e0bc4e
   $validextensions = array("jpeg", "jpg", "png");
   $temporary = explode(".", $_FILES["file"]["name"]);
   $file_extension = end($temporary);
