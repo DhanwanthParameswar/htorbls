@@ -19,7 +19,7 @@ echo "<h2>Book Edit Results</h2>";
 
 if ( isset($_FILES["file"]["type"]) && $_FILES["file"]["type"] != "" )
 {
-  $destination_directory = "/var/www/library.htor.org/images/books/";
+  $destination_directory = book_images_dir() . '/';
   $validextensions = array("jpeg", "jpg", "png");
   $temporary = explode(".", $_FILES["file"]["name"]);
   $file_extension = end($temporary);
@@ -37,8 +37,8 @@ if ( isset($_FILES["file"]["type"]) && $_FILES["file"]["type"] != "" )
       else
       {
           $sourcePath = $_FILES["file"]["tmp_name"];
-          $targetPath = $destination_directory . $bookId . "." . substr($_FILES["file"]["type"], 6);
-          $imgAddress = "http://library.htor.org/images/books/" . $bookId . "." . substr($_FILES["file"]["type"], 6);
+          $targetPath = book_cover_path($bookId);
+          $imgAddress = book_cover_url($bookId);
           move_uploaded_file($sourcePath, $targetPath);
 
           echo "<div class=\"alert alert-success\" role=\"alert\">Image uploaded successful</div>";

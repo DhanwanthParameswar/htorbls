@@ -1,3 +1,8 @@
+<?php
+if (file_exists(__DIR__ . '/config.demo.php')) {
+    require_once __DIR__ . '/config.demo.php';
+}
+?>
 <html>
 <head>
 	<link rel="icon" href="/images/favicon.ico" type="image/x-icon">

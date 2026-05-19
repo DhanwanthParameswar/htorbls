@@ -9,7 +9,7 @@ $result = $mysqli->query($sql);
 <head>
   <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.bootstrap5.css">
-<title>HTOR BLS - Book List</title>
+<title>Demo Library System - Book List</title>
 <style type="text/css">
   .buttons-html5, .buttons-print, .buttons-page-length {
     padding: 5px;
@@ -64,7 +64,7 @@ if(array_key_exists('delete', $_POST)) {
   $bookId = addslashes($_POST["delete"]);
   $sql = "DELETE FROM booklist WHERE bookId = '$bookId'";
   $result = $mysqli->query($sql) or die(mysqli_error($mysqli));
-  $filename = "/var/www/library.htor.org/images/books/" . $bookId . ".jpeg";
+  $filename = book_cover_path($bookId);
   if(file_exists($filename)){
     unlink($filename);
   }

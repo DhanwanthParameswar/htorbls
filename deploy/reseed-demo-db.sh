@@ -38,4 +38,15 @@ mysql -h "${DB_HOST}" -u "${DB_USER}" "${DB_NAME}" -e \
   "INSERT INTO users (username, password) VALUES ('${DEMO_USER}', '${DEMO_HASH}');"
 
 unset MYSQL_PWD
+
+COVERS_SRC="${REPO_ROOT}/demo/book-covers"
+COVERS_DST="${REPO_ROOT}/images/books"
+mkdir -p "${COVERS_DST}"
+rm -f "${COVERS_DST}"/*.jpeg 2>/dev/null || true
+if [[ -d "${COVERS_SRC}" ]]; then
+  cp -f "${COVERS_SRC}"/*.jpeg "${COVERS_DST}/" 2>/dev/null || true
+fi
+chown -R www-data:www-data "${COVERS_DST}" 2>/dev/null || true
+chmod 775 "${COVERS_DST}" 2>/dev/null || true
+
 echo "$(date -Iseconds) Demo DB reseeded (${DB_NAME}@${DB_HOST})"

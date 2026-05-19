@@ -3,6 +3,7 @@ require_once 'config.local.php';
 if (file_exists(__DIR__ . '/config.demo.php')) {
     require_once __DIR__ . '/config.demo.php';
 }
+require_once __DIR__ . '/book_images.php';
 
 // four variables to connect to the database, you must set username and password in config.local.php
 $host = "localhost";

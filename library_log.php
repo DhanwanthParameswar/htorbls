@@ -11,7 +11,7 @@ $result = $mysqli->query($sql);
   <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.bootstrap5.css">
 
-<title>HTOR BLS - Library Log</title>
+<title>Demo Library System - Library Log</title>
 <style type="text/css">
   .buttons-html5, .buttons-print, .buttons-page-length {
     padding: 5px;

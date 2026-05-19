@@ -5,7 +5,7 @@ session_start();
 if (isset($_SESSION['user_id']) && isset($_SESSION['user_username'])) {
 if(array_key_exists('submit', $_POST)) {
 ?>
-<title>HTOR BLS - Book Edit Results</title>
+<title>Demo Library System - Book Edit Results</title>
 <body style="width: 100%; min-height: 100vh; display: -webkit-box; display: -webkit-flex; display: -moz-box; display: -ms-flexbox; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; padding: 15px; background: #F4CABC;">
 <?php if (function_exists("demo_render_banner")) demo_render_banner(); ?>
     <div id="page" class="container text-center" style="width: 750px; background: #fff; border-radius: 10px; overflow: hidden; padding: 33px 55px 33px 55px; box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -moz-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -o-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -ms-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1);">
@@ -37,7 +37,7 @@ echo "<h2>Book Edit Results</h2>";
 
 if ( isset($_FILES["file"]["type"]) && $_FILES["file"]["type"] != ""  && !$check )
 {
-  $destination_directory = "/var/www/library.htor.org/images/books/";
+  $destination_directory = book_images_dir() . '/';
   $validextensions = array("jpeg", "jpg", "png");
   $temporary = explode(".", $_FILES["file"]["name"]);
   $file_extension = end($temporary);
@@ -54,7 +54,7 @@ if ( isset($_FILES["file"]["type"]) && $_FILES["file"]["type"] != ""  && !$check
       }
       else
       {
-          $oldFilename = "/var/www/library.htor.org/images/books/" . $bookIdOld . ".jpeg";
+          $oldFilename = book_cover_path($bookIdOld);
           if(file_exists($oldFilename)){
             unlink($oldFilename);
           }
@@ -96,8 +96,8 @@ if ( isset($_FILES["file"]["type"]) && $_FILES["file"]["type"] != ""  && !$check
 }
 else if (!$check && $bookId != $bookIdOld) {
     // Handle renaming the existing image file when the book ID is changed
-    $oldImagePath = "/var/www/library.htor.org/images/books/" . $bookIdOld . ".jpeg";
-    $newImagePath = "/var/www/library.htor.org/images/books/" . $bookId . ".jpeg";
+    $oldImagePath = book_cover_path($bookIdOld);
+    $newImagePath = book_cover_path($bookId);
 
     // Check if an image exists for the old book ID
     if (file_exists($oldImagePath)) {
@@ -151,7 +151,7 @@ else {
     transition: none !important;
   }
 </style>
-<title>HTOR BLS - Edit Book</title>
+<title>Demo Library System - Edit Book</title>
 <body style="width: 100%; min-height: 100vh; display: -webkit-box; display: -webkit-flex; display: -moz-box; display: -ms-flexbox; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; padding: 15px; background: #F4CABC;">
 <?php if (function_exists("demo_render_banner")) demo_render_banner(); ?>
     <div id="page" class="container text-center" style="width: 750px; background: #fff; border-radius: 10px; overflow: hidden; padding: 33px 55px 33px 55px; box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -moz-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -o-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -ms-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1);">
@@ -188,7 +188,7 @@ while($category = $categoryResult->fetch_assoc()) {
   <label id='imgCurrent' for='exampleInputFile' style='display: inline'><b>Current Image:</b></label>
   <label id='imgNew' for='exampleInputFile' style='display: none'><b>New Image:</b></label>
   <br>
-  <img id='previewImg' src='https://library.htor.org/images/books/$bookId.jpeg?rand=$random' style='max-height: 500px' class='rounded img-fluid'>
+  <img id='previewImg' src='" . htmlspecialchars(book_cover_url($bookId)) . "?rand=$random' style='max-height: 500px' class='rounded img-fluid'>
 </div>
 
 <div class='mb-3 form-group'>
@@ -298,7 +298,7 @@ while($category = $categoryResult->fetch_assoc()) {
           $('#submit').attr('disabled', '');
           $('#imgCurrent').css("display", "inline");
           $('#imgNew').css("display", "none");
-          previewImg.src = 'http://library.htor.org/images/books/<?php echo $bookId ?>.jpeg?rand=<?php echo rand(); ?>';
+          previewImg.src = '<?php echo htmlspecialchars(book_cover_url($bookId), ENT_QUOTES); ?>?rand=<?php echo rand(); ?>';
           return false;
         }
         $('#submit').removeAttr("disabled");
@@ -316,7 +316,7 @@ while($category = $categoryResult->fetch_assoc()) {
         //What ever else you want to do when File Removed
         $('#imgCurrent').css("display", "inline");
         $('#imgNew').css("display", "none");
-        previewImg.src = 'http://library.htor.org/images/books/<?php echo $bookId ?>.jpeg?rand=<?php echo rand(); ?>';
+        previewImg.src = '<?php echo htmlspecialchars(book_cover_url($bookId), ENT_QUOTES); ?>?rand=<?php echo rand(); ?>';
         $('#message').empty();
         $('#submit').removeAttr("disabled");
         

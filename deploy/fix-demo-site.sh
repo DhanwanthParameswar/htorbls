@@ -16,20 +16,20 @@ fi
 
 BACKUP_DIR="$(ls -d /var/www/htorbls.bak.* 2>/dev/null | tail -1 || true)"
 
-echo "==> Restoring config.local.php..."
-if [[ -f "${APP_DIR}/config.local.php" ]]; then
-  echo "Already exists: ${APP_DIR}/config.local.php"
-elif [[ -n "${BACKUP_DIR}" && -f "${BACKUP_DIR}/config.local.php" ]]; then
-  cp -a "${BACKUP_DIR}/config.local.php" "${APP_DIR}/config.local.php"
-  echo "Restored from ${BACKUP_DIR}"
-elif [[ -f "${CREDS}" ]]; then
+echo "==> Syncing config.local.php..."
+if [[ -f "${CREDS}" ]]; then
   DB_PASS="$(awk -F': ' '/^  password:/{print $2}' "${CREDS}")"
   cat > "${APP_DIR}/config.local.php" <<PHP
 <?php
 \$username = "${DB_USER}";
 \$user_pass = "${DB_PASS}";
 PHP
-  echo "Recreated from ${CREDS}"
+  echo "Wrote ${APP_DIR}/config.local.php from ${CREDS}"
+elif [[ -n "${BACKUP_DIR}" && -f "${BACKUP_DIR}/config.local.php" ]]; then
+  cp -a "${BACKUP_DIR}/config.local.php" "${APP_DIR}/config.local.php"
+  echo "Restored from ${BACKUP_DIR}"
+elif [[ -f "${APP_DIR}/config.local.php" ]]; then
+  echo "Keeping existing ${APP_DIR}/config.local.php (no ${CREDS})"
 else
   echo "No config.local.php found." >&2
   exit 1
@@ -44,6 +44,10 @@ mysql <<SQL
 ALTER USER IF EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';
 FLUSH PRIVILEGES;
 SQL
+
+if [[ -x "$(command -v php)" && -f "${DEPLOY_DIR}/fetch-demo-covers.php" ]]; then
+  php "${DEPLOY_DIR}/fetch-demo-covers.php" || true
+fi
 
 "${DEPLOY_DIR}/reseed-demo-db.sh"
 
