@@ -1,48 +1,22 @@
-# Deploy — lms.dhanwanth.com
+# Deploy scripts
 
-Ops scripts for the **demo** branch. The live app and this folder are the same git repo at `/var/www/htorbls`.
+Ops tooling for HTOR BLS. **Full documentation:** [../DEPLOYMENT.md](../DEPLOYMENT.md)
 
-## Layout
-
-| Path | Purpose |
-|------|---------|
-| `deploy/` | These scripts (version controlled) |
-| `deploy/.credentials` | Server-only secrets (**gitignored**) |
-| `demo/seed.sql` | DB snapshot for daily reseed |
-| `config.local.php` | DB config on server (**gitignored**) |
-
-## Common commands
+## Quick commands
 
 ```bash
-cd /var/www/htorbls
+cd /var/www/htorbls   # or your clone path
 
-# Pull app + deploy script updates
-git pull origin demo
-
-# Reseed demo data now
 sudo deploy/reseed-demo-db.sh
-
-# Full fix (config + mysql + reseed)
 sudo deploy/fix-demo-site.sh
-
-# Daily cron (once)
 sudo cp deploy/cron-demo-reseed /etc/cron.d/htorbls-demo-reseed
 ```
 
-## Fresh server install
+## Fresh server
 
 ```bash
 sudo git clone -b demo https://github.com/DhanwanthParameswar/htorbls.git /var/www/htorbls
 sudo bash /var/www/htorbls/deploy/deploy.sh
 ```
 
-## Migrate from `~/htorbls-deploy`
-
-```bash
-sudo bash /var/www/htorbls/deploy/migrate-from-htorbls-deploy.sh
-```
-
-## Branches
-
-- `main` — production library
-- `demo` — portfolio site (this server)
+See [DEPLOYMENT.md](../DEPLOYMENT.md) for local dev, production, Cloudflare Tunnel, and troubleshooting.
