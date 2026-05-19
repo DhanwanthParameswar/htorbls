@@ -2,3 +2,4 @@ phpmyadmin/
 .well-known/
 images/books/
 config.local.php
+deploy/.credentials

@@ -1,0 +1,6 @@
+# Install with: sudo cp /home/ubuntu/htorbls-deploy/cron-demo-reseed /etc/cron.d/htorbls-demo-reseed
+# Resets demo data daily at 4:00 AM server time
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+0 4 * * * root /var/www/htorbls/deploy/reseed-demo-db.sh >> /var/log/htorbls-demo-reseed.log 2>&1

@@ -4,7 +4,8 @@ Deployed to **lms.dhanwanth.com** only.
 
 | File | Purpose |
 |------|---------|
-| `banner.php` | Sticky portfolio notice (included via `demo_render_banner()`) |
-| `seed.sql` | MySQL snapshot; synced with `/home/ubuntu/htorbls-deploy/demo-seed.sql` on the server |
+| `banner.php` | Portfolio notice (via `demo_render_banner()`) |
+| `seed.sql` | MySQL snapshot — source of truth for demo data |
 
-Daily reset on the server: `/home/ubuntu/htorbls-deploy/reseed-demo-db.sh`
+Daily reset: `sudo /var/www/htorbls/deploy/reseed-demo-db.sh`  
+Login: `demo` / `DemoPass123`

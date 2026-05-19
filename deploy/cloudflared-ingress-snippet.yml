@@ -1,0 +1,9 @@
+# Add this entry ABOVE the "http_status:404" catch-all in ~/.cloudflared/config.yml
+# Then: sudo systemctl restart cloudflared   (or your tunnel service name)
+#
+# Also in Cloudflare DNS: CNAME lms -> <your-tunnel-id>.cfargotunnel.com (proxied)
+# If the tunnel is managed only in the Cloudflare dashboard (token run), add a
+# Public Hostname there instead: lms.dhanwanth.com -> http://localhost:8090
+
+  - hostname: lms.dhanwanth.com
+    service: http://localhost:8090
