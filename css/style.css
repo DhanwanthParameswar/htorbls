@@ -177,6 +177,32 @@ a, a:hover {
   color: #fff;
 }
 
+.analytics-card {
+  border-left: 4px solid #E6501E !important;
+}
+
+.analytics-card-label {
+  font-size: 0.85rem;
+}
+
+.analytics-card-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #212529;
+}
+
+.analytics-chart-wrap {
+  position: relative;
+  height: 280px;
+  max-width: 100%;
+}
+
+.analytics-page .btn-outline-secondary.active {
+  background-color: #E6501E;
+  border-color: #E6501E;
+  color: #fff;
+}
+
 /* Success */
 .btn-success:hover, .btn-success:focus {
   background-color: #218a39;

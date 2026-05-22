@@ -60,6 +60,8 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_username'])) {
         <button onclick="window.location.href='./library_archive.php';" id="showarchive" name="showarchive" class="btn btn-orange">Archive</button>
         &nbsp;
         <button onclick="window.location.href='./book_list.php';" id="booklist" name="booklist" class="btn btn-orange">Book List</button>
+        &nbsp;
+        <button onclick="window.location.href='./analytics.php';" id="analytics" name="analytics" class="btn btn-orange">Analytics</button>
         <hr>
 
 <ul class="nav nav-pills nav-fill mb-3" id="pills-tab" role="tablist">

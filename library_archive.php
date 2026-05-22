@@ -30,6 +30,7 @@ $result = $mysqli->query($sql);
       <br>
 
 	<button onclick="window.location.href='./index.php';" id="showlog" name="showlog" class="btn btn-orange mb-3">Return Home</button>
+	<button onclick="window.location.href='./analytics.php';" class="btn btn-orange mb-3">Analytics</button>
 
 	<table id="example" class="table table-striped table-bordered table-hover" style="width:100%">
 	<thead>

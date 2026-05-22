@@ -67,6 +67,7 @@ $result = $mysqli->query($sql);
 	  	<h1 class="text-center pb-2 display-4">Library Log</h1>
 
 	<button onclick="window.location.href='./index.php';" id="showlog" name="showlog" class="btn btn-orange mb-3">Return Home</button>
+	<button onclick="window.location.href='./analytics.php';" class="btn btn-orange mb-3">Analytics</button>
 
 	<hr>
 
