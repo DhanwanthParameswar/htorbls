@@ -78,6 +78,12 @@ curl -sI -H 'Host: library.htor.org' http://127.0.0.1/login.php
 
 Server public IPv4 (reference only): `3.147.61.92` — not used as origin while tunnel is active.
 
+## Backups
+
+Automated nightly backups (local + Google Drive via **rclone**) match the legacy Dropbox layout.
+
+See **[docs/BACKUPS.md](BACKUPS.md)** for schedule, one-time Google Drive setup, restore steps, and manual runs.
+
 ## Day-to-day operations
 
 ### Update app from GitHub

@@ -116,7 +116,9 @@ See [.gitignore](.gitignore):
 
 Production runs on **AWS Lightsail (LAMP)** behind a **Cloudflare Tunnel** at `library.htor.org`.
 
-Server-specific setup (paths, tunnel, MariaDB import, backups) is documented in **[docs/SERVER-SETUP.md](docs/SERVER-SETUP.md)**.
+Server-specific setup (paths, tunnel, MariaDB import) is in **[docs/SERVER-SETUP.md](docs/SERVER-SETUP.md)**.
+
+Nightly backups to Google Drive (rclone): **[docs/BACKUPS.md](docs/BACKUPS.md)**.
 
 ## Support
 
