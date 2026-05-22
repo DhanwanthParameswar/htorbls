@@ -8,6 +8,7 @@ Nightly backups mirror the **legacy server layout** (same files as the Dropbox r
 - `cloudflared_config.tar.gz` — tunnel config (this server)
 - `local_bin.tar.gz` — `backup.sh`
 - `crontab.txt`
+- `secrets_config.tar.gz` — `/etc/htor-backup.cnf`, `/root/.config/rclone/rclone.conf` (sensitive; restrict Drive access)
 
 ## Schedule
 
@@ -84,8 +85,8 @@ sudo tail -50 /var/log/htor-backup.log
 
 | File | Purpose |
 |------|---------|
-| `/etc/htor-backup.cnf` | `mysqldump` credentials (`htorbls` user), mode `600` |
-| `/root/.config/rclone/rclone.conf` | Google Drive OAuth token |
+| `/etc/htor-backup.cnf` | `mysqldump` credentials (`htorbls` user), mode `600`; also in `secrets_config.tar.gz` |
+| `/root/.config/rclone/rclone.conf` | Google Drive OAuth token; also in `secrets_config.tar.gz` |
 
 ## Restore (short)
 

@@ -64,6 +64,15 @@ fi
 
 crontab -l > "$BACKUP_PATH/crontab.txt" 2>/dev/null || true
 
+# Backup credentials needed to restore automated dumps + Drive sync (keep Drive folder private)
+SECRETS_FILES=()
+[[ -f /etc/htor-backup.cnf ]] && SECRETS_FILES+=(/etc/htor-backup.cnf)
+[[ -f /root/.config/rclone/rclone.conf ]] && SECRETS_FILES+=(/root/.config/rclone/rclone.conf)
+if [[ ${#SECRETS_FILES[@]} -gt 0 ]]; then
+  tar -czf "$BACKUP_PATH/secrets_config.tar.gz" "${SECRETS_FILES[@]}"
+  chmod 600 "$BACKUP_PATH/secrets_config.tar.gz"
+fi
+
 if rclone listremotes 2>/dev/null | grep -q "^${RCLONE_REMOTE}:$"; then
   log "Syncing $BACKUP_DIR to ${RCLONE_REMOTE}:${RCLONE_DEST}"
   rclone sync "$BACKUP_DIR" "${RCLONE_REMOTE}:${RCLONE_DEST}" \
