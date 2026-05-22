@@ -203,6 +203,12 @@ a, a:hover {
   color: #fff;
 }
 
+.btn-orange.active {
+  background-color: #CC471B;
+  border-color: #CC471B;
+  color: #fff;
+}
+
 /* Success */
 .btn-success:hover, .btn-success:focus {
   background-color: #218a39;

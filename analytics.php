@@ -1,16 +1,9 @@
 <?php
+require_once __DIR__ . '/includes/auth.php';
+bls_require_auth();
 include "db_connect.php";
 include "bootstrap.php";
-session_start();
-
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_username'])) {
-  header("Location: login.php");
-  exit;
-}
-
-function h($s) {
-  return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
-}
+require_once __DIR__ . '/includes/layout.php';
 
 $range = isset($_GET['range']) ? $_GET['range'] : '6m';
 if (!in_array($range, ['6m', '12m', 'all'], true)) {
@@ -36,27 +29,18 @@ if ($range === '6m') {
   $archiveIssueSql = "1=1";
 }
 
-function queryScalar($mysqli, $sql) {
-  $result = $mysqli->query($sql);
-  if (!$result) {
-    return 0;
-  }
-  $row = $result->fetch_row();
-  return $row ? $row[0] : 0;
-}
-
-$totalBooks = (int)queryScalar($mysqli, "SELECT COUNT(*) FROM booklist");
-$checkedOut = (int)queryScalar($mysqli, "SELECT COUNT(*) FROM librarylog");
-$available = (int)queryScalar($mysqli,
+$totalBooks = (int)db_scalar($mysqli, "SELECT COUNT(*) FROM booklist");
+$checkedOut = (int)db_scalar($mysqli, "SELECT COUNT(*) FROM librarylog");
+$available = (int)db_scalar($mysqli,
   "SELECT COUNT(*) FROM booklist b LEFT JOIN librarylog l ON b.bookId = l.bookId WHERE l.bookId IS NULL"
 );
-$overdue = (int)queryScalar($mysqli, "SELECT COUNT(*) FROM librarylog WHERE dueDate < CURRENT_DATE");
-$dueToday = (int)queryScalar($mysqli, "SELECT COUNT(*) FROM librarylog WHERE dueDate = CURRENT_DATE");
-$outstandingFines = (float)queryScalar($mysqli,
+$overdue = (int)db_scalar($mysqli, "SELECT COUNT(*) FROM librarylog WHERE dueDate < CURRENT_DATE");
+$dueToday = (int)db_scalar($mysqli, "SELECT COUNT(*) FROM librarylog WHERE dueDate = CURRENT_DATE");
+$outstandingFines = (float)db_scalar($mysqli,
   "SELECT COALESCE(SUM(CEIL(GREATEST(DATEDIFF(CURRENT_DATE, dueDate), 0)/7)*0.25), 0) FROM librarylog"
 );
-$returnsPeriod = (int)queryScalar($mysqli, "SELECT COUNT(*) FROM libraryarchive WHERE $rangeSql");
-$finesCollected = (float)queryScalar($mysqli,
+$returnsPeriod = (int)db_scalar($mysqli, "SELECT COUNT(*) FROM libraryarchive WHERE $rangeSql");
+$finesCollected = (float)db_scalar($mysqli,
   "SELECT COALESCE(SUM(fineAmountPaid), 0) FROM libraryarchive WHERE $rangeSql"
 );
 
@@ -139,7 +123,7 @@ if ($result) {
     <p class="text-muted">Snapshot metrics reflect the current state. Period metrics use the selected range.</p>
 
     <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
-      <button onclick="window.location.href='./index.php';" class="btn btn-orange">Return Home</button>
+      <?php bls_render_subpage_toolbar('analytics'); ?>
       <a href="analytics.php?range=6m" class="btn btn-outline-secondary<?= $range === '6m' ? ' active' : '' ?>">Last 6 months</a>
       <a href="analytics.php?range=12m" class="btn btn-outline-secondary<?= $range === '12m' ? ' active' : '' ?>">Last 12 months</a>
       <a href="analytics.php?range=all" class="btn btn-outline-secondary<?= $range === 'all' ? ' active' : '' ?>">All time</a>

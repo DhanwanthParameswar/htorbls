@@ -1,35 +1,32 @@
 <?php
+require_once __DIR__ . '/includes/auth.php';
+bls_require_auth();
 include "bootstrap.php";
 include "db_connect.php";
-session_start();
-if (isset($_SESSION['user_id']) && isset($_SESSION['user_username'])) {
 if(array_key_exists('submit', $_POST)) {
 ?>
 <title>HTOR BLS - Book Edit Results</title>
 <body style="width: 100%; min-height: 100vh; display: -webkit-box; display: -webkit-flex; display: -moz-box; display: -ms-flexbox; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; padding: 15px; background: #F4CABC;">
     <div id="page" class="container text-center" style="width: 750px; background: #fff; border-radius: 10px; overflow: hidden; padding: 33px 55px 33px 55px; box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -moz-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -o-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -ms-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1);">
 <?php
-$bookName = trim(addslashes($_POST["bookName"]));
-$bookCategory = trim(addslashes($_POST["bookCategory"]));
-$additionalNotes = trim(addslashes($_POST["additionalNotes"]));
-$bookId = strtoupper(preg_replace('/\s+/', '', trim(addslashes($_POST["bookId"]))));
-$bookIdOld = addslashes($_POST["bookIdOld"]);
-$id = addslashes($_POST["id"]);
-// search the database for the search parameter
+$bookName = trim($_POST["bookName"] ?? '');
+$bookCategory = trim($_POST["bookCategory"] ?? '');
+$additionalNotes = trim($_POST["additionalNotes"] ?? '');
+$bookId = normalize_book_id($_POST["bookId"] ?? '');
+$bookIdOld = normalize_book_id($_POST["bookIdOld"] ?? '');
+$id = (int)($_POST["id"] ?? 0);
 echo "<h2>Book Edit Results</h2>";
 
-  $sql = "SELECT * FROM booklist WHERE bookId = '$bookId'";
-  $result = $mysqli->query($sql);
-  $check = false;
-  if($result->num_rows > 0 && $bookId != $bookIdOld){
-    $check = true;
-  }
-  if ($check){
+  $existing = db_fetch_one($mysqli, "SELECT bookId FROM booklist WHERE bookId = ?", 's', [$bookId]);
+  $check = $existing !== null && $bookId !== $bookIdOld;
+  if ($check) {
     echo "<div class='alert alert-danger' role='alert'>Error: Book ID is being used by another book, book not edited.</div>";
-  }
-  else{
-    $sql = "UPDATE booklist SET bookId = '$bookId', bookName = '$bookName', bookCategory = '$bookCategory', additionalNotes = '$additionalNotes' WHERE id = '$id'";
-    $result = $mysqli->query($sql);
+  } else {
+    db_execute($mysqli,
+      "UPDATE booklist SET bookId = ?, bookName = ?, bookCategory = ?, additionalNotes = ? WHERE id = ?",
+      'ssssi',
+      [$bookId, $bookName, $bookCategory, $additionalNotes, $id]
+    );
 
     echo "<div class=\"alert alert-success\" role=\"alert\">Book edited successfully</div>";
   }
@@ -155,10 +152,9 @@ else {
     <div id="page" class="container text-center" style="width: 750px; background: #fff; border-radius: 10px; overflow: hidden; padding: 33px 55px 33px 55px; box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -moz-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -o-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -ms-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1);">
     <h1 class="text-center pb-2 display-4">Edit Book</h1>
 <?php
-$bookId = addslashes($_GET["edit"]);
+$bookId = normalize_book_id($_GET["edit"] ?? '');
 
-$sql = "SELECT id, bookName, bookCategory, additionalNotes FROM booklist WHERE bookId = '$bookId'";
-$result = $mysqli->query($sql);
+$result = db_select($mysqli, "SELECT id, bookName, bookCategory, additionalNotes FROM booklist WHERE bookId = ?", 's', [$bookId]);
 
 if ($result->num_rows > 0) {
   // output data of each row
@@ -322,9 +318,5 @@ while($category = $categoryResult->fetch_assoc()) {
 </script>
 </body>
 <?php
-}
-}
-else {
-  header("Location: login.php");
 }
 ?>

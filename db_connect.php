@@ -14,4 +14,6 @@ if ($mysqli->connect_errno) {
 	echo "FATAL ERROR: CONTACT ADMIN - Failed to connect to MySQL Database: (" . $mysqli->connect_errno . ") " . $mysqli->connect_errno;
 }
 
+require_once __DIR__ . '/db_helpers.php';
+
 ?>

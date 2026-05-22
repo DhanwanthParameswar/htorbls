@@ -1,8 +1,9 @@
 <?php
+require_once __DIR__ . '/includes/auth.php';
+bls_require_auth();
 include "db_connect.php";
 include "bootstrap.php";
-session_start();
-if (isset($_SESSION['user_id']) && isset($_SESSION['user_username'])) {
+require_once __DIR__ . '/includes/layout.php';
 $sql = "UPDATE librarylog SET fineAmount = CEIL(GREATEST(DATEDIFF(CURRENT_DATE, `dueDate`), 0)/7)*0.25";
 $result = $mysqli->query($sql);
 ?>
@@ -29,8 +30,7 @@ $result = $mysqli->query($sql);
       <br>
       <br>
 
-	<button onclick="window.location.href='./index.php';" id="showlog" name="showlog" class="btn btn-orange mb-3">Return Home</button>
-	<button onclick="window.location.href='./analytics.php';" class="btn btn-orange mb-3">Analytics</button>
+	<?php bls_render_subpage_toolbar('archive'); ?>
 
 	<table id="example" class="table table-striped table-bordered table-hover" style="width:100%">
 	<thead>
@@ -48,26 +48,27 @@ $result = $mysqli->query($sql);
 	<tbody>
 <?php
 if(array_key_exists('delete', $_POST)) {
-	$bookId = addslashes($_POST["delete"]);
-	$sql = "DELETE FROM libraryarchive WHERE bookId = '$bookId'";
-  $result = $mysqli->query($sql) or die(mysqli_error($mysqli));
-  echo "<div class='alert alert-danger' role='alert'>Item <b>$bookId</b> Deleted from Archive</div>";
+	$bookId = normalize_book_id($_POST["delete"] ?? '');
+	if ($bookId !== '' && db_execute($mysqli, "DELETE FROM libraryarchive WHERE bookId = ?", 's', [$bookId])) {
+    echo "<div class='alert alert-danger' role='alert'>Item <b>" . h($bookId) . "</b> Deleted from Archive</div>";
+  }
 }
 elseif (array_key_exists('add', $_POST)) {
-  $bookId = addslashes($_POST["add"]);
-  $sql = "SELECT patronName, contactInfo, issueDate, dueDate FROM libraryarchive WHERE bookId = '$bookId'";
-  $result = $mysqli->query($sql) or die(mysqli_error($mysqli));
-  if ($result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-    $patronName = $row['patronName'];
-    $contactInfo = $row['contactInfo'];
-    $issueDate = $row['issueDate'];
-    $dueDate = $row['dueDate'];
-    $sql = "INSERT INTO librarylog (patronName, contactInfo, bookId, issueDate, dueDate, fineAmount) VALUES ('$patronName', '$contactInfo', '$bookId', '$issueDate', '$dueDate', '0.00')";
-    $result = $mysqli->query($sql) or die(mysqli_error($mysqli));
-    $sql = "DELETE FROM libraryarchive WHERE bookId = '$bookId'";
-    $result = $mysqli->query($sql) or die(mysqli_error($mysqli));
-    echo "<div class='alert alert-success' role='alert'>Item <b>$bookId</b> Added to Log</div>";
+  $bookId = normalize_book_id($_POST["add"] ?? '');
+  $row = db_fetch_one($mysqli,
+    "SELECT patronName, contactInfo, issueDate, dueDate FROM libraryarchive WHERE bookId = ?",
+    's',
+    [$bookId]
+  );
+  if ($row) {
+    if (db_execute($mysqli,
+      "INSERT INTO librarylog (patronName, contactInfo, bookId, issueDate, dueDate, fineAmount) VALUES (?, ?, ?, ?, ?, '0.00')",
+      'sssss',
+      [$row['patronName'], $row['contactInfo'], $bookId, $row['issueDate'], $row['dueDate']]
+    )) {
+      db_execute($mysqli, "DELETE FROM libraryarchive WHERE bookId = ?", 's', [$bookId]);
+      echo "<div class='alert alert-success' role='alert'>Item <b>" . h($bookId) . "</b> Added to Log</div>";
+    }
   }
 }
 
@@ -125,10 +126,3 @@ $('#example').DataTable( {
 });
 </script>
 </body>
-
- <?php
-}
-else {
-  header("Location: login.php");
-}
-?>

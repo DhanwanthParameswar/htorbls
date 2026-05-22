@@ -1,50 +1,42 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/auth.php';
+bls_require_auth();
+include 'bootstrap.php';
+include 'db_connect.php';
 
-if ( isset($_FILES["file"]["type"]) )
-{
-  $destination_directory = "upload/";
-  $validextensions = array("jpeg", "jpg", "png");
+if (!isset($_FILES['file']['type'])) {
+  exit;
+}
 
-  $temporary = explode(".", $_FILES["file"]["name"]);
-  $file_extension = end($temporary);
+$destination_directory = __DIR__ . '/upload/';
+$validextensions = ['jpeg', 'jpg', 'png'];
+$allowedMimes = ['image/png', 'image/jpg', 'image/jpeg'];
 
-  // We need to check for image format and size again, because client-side code can be altered
-  if ( (($_FILES["file"]["type"] == "image/png") ||
-        ($_FILES["file"]["type"] == "image/jpg") ||
-        ($_FILES["file"]["type"] == "image/jpeg")
-       ) && in_array($file_extension, $validextensions))
-  {
-      if ( $_FILES["file"]["error"] > 0 )
-      {
-        echo "<div class=\"alert alert-danger\" role=\"alert\">Error: <strong>" . $_FILES["file"]["error"] . "</strong></div>";
-      }
-      else
-      {
-        if ( file_exists($destination_directory . $_FILES["file"]["name"]) )
-        {
-          echo "<div class=\"alert alert-danger\" role=\"alert\">Error: File <strong>" . $_FILES["file"]["name"] . "</strong> already exists.</div>";
-        }
-        else
-        {
-          $sourcePath = $_FILES["file"]["tmp_name"];
-          $targetPath = $destination_directory . $_FILES["file"]["name"];
-          move_uploaded_file($sourcePath, $targetPath);
+$temporary = explode('.', $_FILES['file']['name']);
+$file_extension = strtolower(end($temporary));
+$safeName = preg_replace('/[^A-Za-z0-9._-]/', '_', basename($_FILES['file']['name']));
 
-          echo "<div class=\"alert alert-success\" role=\"alert\">";
-          echo "<p>Image uploaded successful</p>";
-          echo "<p>File Name: <a href=\"". $targetPath . "\"><strong>" . $targetPath . "</strong></a></p>";
-          echo "<p>Type: <strong>" . $_FILES["file"]["type"] . "</strong></p>";
-          echo "<p>Size: <strong>" . round($_FILES["file"]["size"]/1024, 2) . " kB</strong></p>";
-          echo "<p>Temp file: <strong>" . $_FILES["file"]["tmp_name"] . "</strong></p>";
-          echo "</div>";
-        }
-      }
+if (
+  in_array($_FILES['file']['type'], $allowedMimes, true)
+  && in_array($file_extension, $validextensions, true)
+) {
+  if ($_FILES['file']['error'] > 0) {
+    echo '<div class="alert alert-danger" role="alert">Error: <strong>' . h((string)$_FILES['file']['error']) . '</strong></div>';
+  } else {
+    $targetPath = $destination_directory . $safeName;
+    if (file_exists($targetPath)) {
+      echo '<div class="alert alert-danger" role="alert">Error: File <strong>' . h($safeName) . '</strong> already exists.</div>';
+    } elseif (move_uploaded_file($_FILES['file']['tmp_name'], $targetPath)) {
+      echo '<div class="alert alert-success" role="alert">';
+      echo '<p>Image uploaded successfully</p>';
+      echo '<p>File Name: <a href="upload/' . h($safeName) . '"><strong>' . h($safeName) . '</strong></a></p>';
+      echo '</div>';
+    } else {
+      echo '<div class="alert alert-danger" role="alert">Upload failed.</div>';
+    }
   }
-  else
-  {
-    echo "<div class=\"alert alert-danger\" role=\"alert\">Unvalid image format. Allowed formats: JPG, JPEG, PNG.</div>";
-  }
+} else {
+  echo '<div class="alert alert-danger" role="alert">Invalid image format. Allowed formats: JPG, JPEG, PNG.</div>';
 }
 
 ?>

@@ -86,6 +86,9 @@ INSERT INTO users (username, password) VALUES ('librarian', '<hash-from-above>')
 ## Project layout
 
 ```
+├── includes/
+│   ├── auth.php           # Shared session helpers (bls_require_auth, etc.)
+│   └── layout.php         # Shared user bar and navigation
 ├── index.php              # Main dashboard (after login)
 ├── login.php / auth.php   # Authentication
 ├── library_log.php        # Active checkouts

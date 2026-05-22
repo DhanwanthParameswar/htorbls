@@ -1,8 +1,8 @@
 <?php
+require_once __DIR__ . '/includes/auth.php';
+bls_require_auth();
 include "bootstrap.php";
 include "db_connect.php";
-session_start();
-if (isset($_SESSION['user_id']) && isset($_SESSION['user_username'])) {
 $sql = "UPDATE librarylog SET fineAmount = CEIL(GREATEST(DATEDIFF(CURRENT_DATE, `dueDate`), 0)/7)*0.25";
 $result = $mysqli->query($sql);
 ?>
@@ -11,16 +11,14 @@ $result = $mysqli->query($sql);
     <div class="container text-center" style="width: 750px; background: #fff; border-radius: 10px; overflow: hidden; padding: 33px 55px 33px 55px; box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -moz-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -o-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -ms-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1);">
       <h1 class="text-center pb-2 display-4">Book ID Tool</h1>
 <?php
-$bookId = strtoupper(preg_replace('/\s+/', '', trim(addslashes($_GET["bookId"]))));
+$bookId = normalize_book_id($_GET["bookId"] ?? '');
 
-echo "<h4>Entry for <b>$bookId</b></h4>";
+echo "<h4>Entry for <b>" . h($bookId) . "</b></h4>";
 
-$sql = "SELECT patronName, contactInfo, issueDate, dueDate, fineAmount FROM librarylog WHERE bookId = '$bookId'";
-$result = $mysqli->query($sql);
-$sql = "SELECT bookName, bookCategory, additionalNotes FROM booklist WHERE bookId = '$bookId'";
-$result2 = $mysqli->query($sql);
+$result = db_select($mysqli, "SELECT patronName, contactInfo, issueDate, dueDate, fineAmount FROM librarylog WHERE bookId = ?", 's', [$bookId]);
+$result2 = db_select($mysqli, "SELECT bookName, bookCategory, additionalNotes FROM booklist WHERE bookId = ?", 's', [$bookId]);
 
-if ($result->num_rows > 0 && $result2->num_rows > 0) {
+if ($result && $result2 && $result->num_rows > 0 && $result2->num_rows > 0) {
   // output data of each row
     echo "<div class='alert alert-danger' role='alert'>Status: <b>Checked Out</b></div>";
     $row = $result->fetch_assoc();
@@ -92,19 +90,19 @@ if ($result->num_rows > 0 && $result2->num_rows > 0) {
       <div class='btn-group' role='group'>
 
     <form action='book_id_tool_return.php'>
-    <button id='return' name='return' class='btn btn-orange' value='$bookId'>Return</button>
+    <button id='return' name='return' class='btn btn-orange' value='" . h($bookId) . "'>Return</button>
   </form>
 
       &nbsp;
       &nbsp;
 
   <form action='book_id_tool_renew.php'>
-    <button id='renew' name='renew' class='btn btn-orange' value='$bookId'>Renew</button>
+    <button id='renew' name='renew' class='btn btn-orange' value='" . h($bookId) . "'>Renew</button>
   </form>
 
       </div>
     ";
-} elseif ($result2->num_rows > 0) {
+} elseif ($result2 && $result2->num_rows > 0) {
     echo "<div class='alert alert-success' role='alert'>Status: <b>Available</b></div>";
     $row2 = $result2->fetch_assoc();
     echo "
@@ -139,9 +137,3 @@ else {
 <button onclick="window.location.href='./index.php';" id="showlog" name="showlog" class="btn btn-orange">Return Home</button>
 </div>
 </body>
-<?php
-}
-else {
-  header("Location: login.php");
-}
-?>

@@ -1,8 +1,9 @@
 <?php
+require_once __DIR__ . '/includes/auth.php';
+bls_require_auth();
 include "db_connect.php";
 include "bootstrap.php";
-session_start();
-if (isset($_SESSION['user_id']) && isset($_SESSION['user_username'])) {
+require_once __DIR__ . '/includes/layout.php';
 $sql = "UPDATE librarylog SET fineAmount = CEIL(GREATEST(DATEDIFF(CURRENT_DATE, `dueDate`), 0)/7)*0.25";
 $result = $mysqli->query($sql);
 ?>
@@ -45,8 +46,7 @@ $result = $mysqli->query($sql);
     <div class="container text-center" style="width: 1200px; background: #fff; border-radius: 10px; overflow: hidden; padding: 33px 55px 33px 55px; box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -moz-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -o-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -ms-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1);">
       <h1 class="text-center pb-2 display-4">Book List</h1>
 
-  <button onclick="window.location.href='./index.php';" id="showlog" name="showlog" class="btn btn-orange mb-3">Return Home</button>
-  <button onclick="window.location.href='./analytics.php';" class="btn btn-orange mb-3">Analytics</button>
+  <?php bls_render_subpage_toolbar('book_list'); ?>
 
   <table id="example" class="table table-striped table-bordered table-hover" style="width:100%">
   <thead>
@@ -61,14 +61,14 @@ $result = $mysqli->query($sql);
   <tbody>
 <?php
 if(array_key_exists('delete', $_POST)) {
-  $bookId = addslashes($_POST["delete"]);
-  $sql = "DELETE FROM booklist WHERE bookId = '$bookId'";
-  $result = $mysqli->query($sql) or die(mysqli_error($mysqli));
-  $filename = "/var/www/library.htor.org/images/books/" . $bookId . ".jpeg";
-  if(file_exists($filename)){
-    unlink($filename);
+  $bookId = normalize_book_id($_POST["delete"] ?? '');
+  if ($bookId !== '' && db_execute($mysqli, "DELETE FROM booklist WHERE bookId = ?", 's', [$bookId])) {
+    $filename = "/var/www/library.htor.org/images/books/" . $bookId . ".jpeg";
+    if (file_exists($filename)) {
+      unlink($filename);
+    }
+    echo "<div class='alert alert-danger' role='alert'>Item <b>" . h($bookId) . "</b> Deleted from Book List</div>";
   }
-  echo "<div class='alert alert-danger' role='alert'>Item <b>$bookId</b> Deleted from Book List</div>";
 }
 
 $sql = "SELECT bookId, bookName, bookCategory, additionalNotes FROM booklist";
@@ -135,10 +135,3 @@ $('#example').DataTable( {
 });
 </script>
 </body>
-
- <?php
-}
-else {
-  header("Location: login.php");
-}
-?>
