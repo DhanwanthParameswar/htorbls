@@ -4,51 +4,23 @@ bls_require_auth();
 include "bootstrap.php";
 include "db_connect.php";
 require_once __DIR__ . '/includes/layout.php';
+require_once __DIR__ . '/includes/patrons.php';
+
+$preselectPatronId = (int)($_GET['patron_id'] ?? 0);
+$preselectPatron = $preselectPatronId > 0 ? patron_get($mysqli, $preselectPatronId) : null;
 ?>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>HTOR BLS</title>
-  </head>
-  <style type="text/css">
-  .btn-outline-secondary:active {
-    color: black;
-    border: var(--bs-border-width) solid var(--bs-border-color);
-  }
-  .btn-outline-secondary, .btn-outline-secondary:focus {
-    background-color: #F8F9FA;
-    color: #212529;
-    box-shadow: none;
-    border: var(--bs-border-width) solid var(--bs-border-color);
-    --bs-border-radius: 0.375rem;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    font-size: 1rem;
-    font-weight: 400;
-    padding: .375rem .75rem;
-    -webkit-transition: none !important;
-    -moz-transition: none !important;
-    -o-transition: none !important;
-    transition: none !important;
-  }
-  .btn-outline-secondary:hover {
-    background-color: #E9ECEF;
-    border: var(--bs-border-width) solid var(--bs-border-color);
-    color: #212529;
-    -webkit-transition: none !important;
-    -moz-transition: none !important;
-    -o-transition: none !important;
-    transition: none !important;
-  }
-</style>
-  <body style="width: 100%; min-height: 100vh; display: -webkit-box; display: -webkit-flex; display: -moz-box; display: -ms-flexbox; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; padding: 15px; background: #F4CABC;">
+<title>HTOR BLS</title>
+</head>
+<body style="width: 100%; min-height: 100vh; display: -webkit-box; display: -webkit-flex; display: -moz-box; display: -ms-flexbox; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; padding: 15px; background: #F4CABC;">
       <div class="container text-center" style="width: 1000px; background: #fff; border-radius: 10px; overflow: hidden; padding: 77px 55px 33px 55px; box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -moz-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -o-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -ms-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1);">
         <h1 class="text-center pb-2 display-4"><img class="htorlogo" src="./images/htorlogo.svg" alt="HTOR Logo" width="100" height="100"> Balvihar Library System (BLS)</h1>
         <?php bls_render_user_bar(); ?>
         <hr>
         <?php bls_render_main_nav(); ?>
         <hr>
+        <?php if (!empty($_GET['error'])): ?>
+        <div class="alert alert-danger"><?= h($_GET['error']) ?></div>
+        <?php endif; ?>
 
 <ul class="nav nav-pills nav-fill mb-3" id="pills-tab" role="tablist">
   <li class="nav-item" role="presentation">
@@ -64,14 +36,7 @@ require_once __DIR__ . '/includes/layout.php';
 <div class="tab-content" id="pills-tabContent">
   <div class="tab-pane fade show active" id="pills-newentry" role="tabpanel" aria-labelledby="pills-newentry" tabindex="0">
             <form class="form-horizontal text-start needs-validation" action="new_entry.php" novalidate>
-          <div class="form-floating mb-3">
-            <input id="patronName" name="patronName" type="text" placeholder="Enter Name" class="form-control input-md" required="">
-            <label for="patronName">Patron Name</label>
-          </div>
-          <div class="form-floating mb-3">
-            <input id="contactInfo" name="contactInfo" type="text" placeholder="e.g. Phone Number, Parent Name, Class" class="form-control input-md" required="">
-            <label for="contactInfo">Contact Info</label>
-          </div>
+          <?php patron_render_picker('patronSearch', 'patron_id', $preselectPatronId, $preselectPatron, 'index.php'); ?>
           <div class="form-floating mb-3">
             <input id="bookId" name="bookId" type="text" placeholder="Enter Book ID(s)" class="form-control input-md" required="">
             <small class="text-muted">You can enter multiple Book ID's by separating them with a comma ","</small>
@@ -243,6 +208,7 @@ require_once __DIR__ . '/includes/layout.php';
         
     }
 </script>
+<?php patron_picker_script(); ?>
   </body>
 </html>
 <?php

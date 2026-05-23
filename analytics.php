@@ -4,6 +4,7 @@ bls_require_auth();
 include "db_connect.php";
 include "bootstrap.php";
 require_once __DIR__ . '/includes/layout.php';
+require_once __DIR__ . '/includes/patrons.php';
 
 $range = isset($_GET['range']) ? $_GET['range'] : '6m';
 if (!in_array($range, ['6m', '12m', 'all'], true)) {
@@ -97,13 +98,14 @@ if ($result) {
 }
 
 $topPatrons = [];
-$sql = "SELECT patronName, MAX(contactInfo) AS contactInfo, COUNT(*) AS checkout_count
+$sql = "SELECT p.id AS patron_id, p.patronName, p.contactInfo, COUNT(*) AS checkout_count
   FROM (
-    SELECT patronName, contactInfo FROM libraryarchive WHERE $archiveIssueSql
+    SELECT patron_id FROM libraryarchive WHERE $archiveIssueSql AND patron_id IS NOT NULL
     UNION ALL
-    SELECT patronName, contactInfo FROM librarylog
+    SELECT patron_id FROM librarylog WHERE patron_id IS NOT NULL
   ) AS all_checkouts
-  GROUP BY patronName
+  INNER JOIN patrons p ON p.id = all_checkouts.patron_id
+  GROUP BY p.id, p.patronName, p.contactInfo
   ORDER BY checkout_count DESC
   LIMIT 10";
 $result = $mysqli->query($sql);
@@ -113,7 +115,6 @@ if ($result) {
   }
 }
 ?>
-<head>
 <title>HTOR BLS - Library Analytics</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
@@ -268,7 +269,7 @@ if ($result) {
             <?php else: ?>
               <?php foreach ($topPatrons as $row): ?>
                 <tr>
-                  <td><?= h($row['patronName']) ?></td>
+                  <td><a href="patron.php?id=<?= (int)$row['patron_id'] ?>"><?= h($row['patronName']) ?></a></td>
                   <td><?= h($row['contactInfo']) ?></td>
                   <td><?= (int)$row['checkout_count'] ?></td>
                 </tr>

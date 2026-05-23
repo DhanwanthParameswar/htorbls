@@ -127,11 +127,22 @@ Tables used by the app:
 | Table | Role |
 |-------|------|
 | `users` | Login (`username`, bcrypt `password`) |
+| `patrons` | Patron registry (`patronName`, `contactInfo`, `phoneNormalized`) |
 | `booklist` | Catalog (`bookId` unique) |
-| `librarylog` | Active checkouts (`bookId` unique, FK to `booklist`) |
-| `libraryarchive` | Returned items |
+| `librarylog` | Active checkouts (`bookId` unique, `patron_id`, FK to `booklist`) |
+| `libraryarchive` | Returned items (`patron_id`) |
 
-No schema SQL ships in the repo; use a backup dump or export from production.
+Schema for patrons: [`docs/schema/patrons.sql`](../docs/schema/patrons.sql). The app DB user may not have `CREATE` privilege — run SQL as admin, then:
+
+```bash
+# As MySQL admin (once per environment):
+sudo mysql library < /var/www/library.htor.org/docs/schema/patrons.sql
+sudo mysql library -e "ALTER TABLE librarylog ADD COLUMN patron_id INT NULL, ADD INDEX idx_librarylog_patron_id (patron_id);"
+sudo mysql library -e "ALTER TABLE libraryarchive ADD COLUMN patron_id INT NULL, ADD INDEX idx_libraryarchive_patron_id (patron_id);"
+
+# Link historical rows (app user):
+php /var/www/library.htor.org/scripts/migrate_patrons.php
+```
 
 ## Backup restore (repeat deploy)
 

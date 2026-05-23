@@ -4,27 +4,14 @@ bls_require_auth();
 include "db_connect.php";
 include "bootstrap.php";
 require_once __DIR__ . '/includes/layout.php';
+require_once __DIR__ . '/includes/patrons.php';
 $sql = "UPDATE librarylog SET fineAmount = CEIL(GREATEST(DATEDIFF(CURRENT_DATE, `dueDate`), 0)/7)*0.25";
 $result = $mysqli->query($sql);
 ?>
-<head>
-  
-  <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.bootstrap5.css">
-
+<?php require_once __DIR__ . '/includes/datatables_head.php'; ?>
 <title>HTOR BLS - Library Log</title>
-<style type="text/css">
-  .buttons-html5, .buttons-print, .buttons-page-length {
-    padding: 5px;
-    margin: 5px;
-    box-shadow: none;
-    border-radius: 5px !important;
-    border: 1px solid #dee2e6;
-    background-color: #fff;
-    color: #000;
-  }
-</style>
 </head>
+<body style="width: 100%; min-height: 100vh; display: -webkit-box; display: -webkit-flex; display: -moz-box; display: -ms-flexbox; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; padding: 15px; background: #F4CABC;">
   <div class="modal fade" id="reg-modal" tabindex="-1" aria-labelledby="modal-title" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
@@ -63,7 +50,6 @@ $result = $mysqli->query($sql);
     </div>
   </div>
 
-<body style="width: 100%; min-height: 100vh; display: -webkit-box; display: -webkit-flex; display: -moz-box; display: -ms-flexbox; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; padding: 15px; background: #F4CABC;">
 	  <div class="container text-center" style="width: 1200px; background: #fff; border-radius: 10px; overflow: hidden; padding: 33px 55px 33px 55px; box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -moz-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -o-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -ms-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1);">
 	  	<h1 class="text-center pb-2 display-4">Library Log</h1>
 
@@ -82,7 +68,7 @@ $result = $mysqli->query($sql);
 			<th>Issue Date</th>
 			<th>Due Date</th>
 			<th>Fine Amount</th>
-			<th>Quick Tools</th>
+			<th class="bls-quick-tools-cell">Quick Tools</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -106,7 +92,9 @@ if(array_key_exists('delete', $_POST)) {
   }
 }
 
-$sql = "SELECT patronName, contactInfo, bookId, issueDate, dueDate, fineAmount FROM librarylog";
+$sql = "SELECT l.patron_id, " . patron_select_name_sql('l') . ", " . patron_select_contact_sql('l') . ",
+  l.bookId, l.issueDate, l.dueDate, l.fineAmount
+  FROM librarylog l " . patron_log_display_join_sql('l');
 $result = $mysqli->query($sql);
 
 if(!empty($result)) {
@@ -134,24 +122,19 @@ if ($result->num_rows > 0) {
 			$fineToday = "";
 		}
 
-    echo "<tr><td>". $row["patronName"] ."</td><td>". $row["contactInfo"] ."</td><td>". $row["bookId"] ."</td><td>". $row["issueDate"] ."</td><td>" .$row["dueDate"] . $dueToday ."</td><td>". "$" . $row["fineAmount"] . $fineToday ."</td><td>". "
-    	<div class='btn-group' role='group'>
-
+    $patronCell = h($row['patronName']);
+    if (!empty($row['patron_id'])) {
+      $patronCell = '<a href="patron.php?id=' . (int)$row['patron_id'] . '">' . $patronCell . '</a>';
+    }
+    echo "<tr><td>". $patronCell ."</td><td>". h($row["contactInfo"]) ."</td><td>". h($row["bookId"]) ."</td><td>". h($row["issueDate"]) ."</td><td>" . h($row["dueDate"]) . $dueToday ."</td><td>". "$" . h($row["fineAmount"]) . $fineToday ."</td><td class='bls-quick-tools-cell'><div class='bls-quick-tools' role='group'>
       <form action='book_id_tool.php'>
-    	<button id='bookId' name='bookId' class='btn btn-orange btn-sm' value='$bookId'><i class='bi bi-tools'></i></button>
+    	<button type='submit' id='bookId' name='bookId' class='btn btn-orange btn-sm' value='$bookId' title='Book ID tool'><i class='bi bi-tools'></i></button>
 			</form>
-
-			&nbsp;
-
       <form action='edit_entry.php'>
-    	<button id='edit' name='edit' class='btn btn-orange btn-sm' value='$bookId'><i class='bi bi-pencil-square'></i></button>
+    	<button type='submit' id='edit' name='edit' class='btn btn-orange btn-sm' value='$bookId' title='Edit entry'><i class='bi bi-pencil-square'></i></button>
 			</form>
-
-			&nbsp;
-
-      <button class='delete-click btn btn-danger btn-sm' data-id='$bookId' data-bs-toggle='modal' data-bs-target='#reg-modal'><i class='bi bi-trash-fill'></i></button>
-
-      </div>" ."</td></tr>";
+      <button type='button' class='delete-click btn btn-danger btn-sm' data-id='$bookId' data-bs-toggle='modal' data-bs-target='#reg-modal' title='Delete'><i class='bi bi-trash-fill'></i></button>
+      </div></td></tr>";
   }
 }
 }
@@ -160,8 +143,6 @@ echo "</table>";
 echo "</div>";
 ?>
 
-<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
 <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
 <script src="https://cdn.datatables.net/buttons/3.1.2/js/dataTables.buttons.js"></script>
@@ -178,9 +159,7 @@ $(document).on("click", ".delete-click", function () {
 });
 
 $('#example').DataTable( {
-  columnDefs: [
-    { orderable: false, targets: 4 }
-  ],
+  columnDefs: [{ orderable: false, targets: 'bls-quick-tools-cell' }],
   order: [[1, 'asc']],
       layout: {
         topStart: {

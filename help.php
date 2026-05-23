@@ -1,12 +1,13 @@
 <?php
-include "bootstrap.php";
 ?>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>HTOR BLS - Help/Support</title>
-    <style type="text/css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<?php require_once __DIR__ . '/includes/bls_assets.php'; ?>
+<title>HTOR BLS - Help/Support</title>
+<style type="text/css">
       iframe {
           aspect-ratio: 16 / 9;
           width: 100% !important;

@@ -3,88 +3,67 @@ require_once __DIR__ . '/includes/auth.php';
 bls_require_auth();
 include "bootstrap.php";
 include "db_connect.php";
+require_once __DIR__ . '/includes/patrons.php';
 ?>
 <title>HTOR BLS - Edit Entry</title>
-<body style="width: 100%; min-height: 100vh; display: -webkit-box; display: -webkit-flex; display: -moz-box; display: -ms-flexbox; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; padding: 15px; background: #F4CABC;">
-    <div class="container text-center" style="width: 750px; background: #fff; border-radius: 10px; overflow: hidden; padding: 33px 55px 33px 55px; box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -moz-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -o-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -ms-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1);">
+</head>
+<body style="width: 100%; min-height: 100vh; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; padding: 15px; background: #F4CABC;">
+    <div class="container text-center" style="width: 750px; background: #fff; border-radius: 10px; overflow: hidden; padding: 33px 55px 33px 55px; box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1);">
     <h1 class="text-center pb-2 display-4">Edit Entry</h1>
     <h6 class="text-center text-muted">Note: Fines are based off of Dates.</h6>
 <?php
 $bookId = normalize_book_id($_GET["edit"] ?? '');
 
-$result = db_select($mysqli, "SELECT id, patronName, contactInfo, bookId, issueDate, dueDate, fineAmount FROM librarylog WHERE bookId = ?", 's', [$bookId]);
+$row = db_fetch_one($mysqli,
+  "SELECT l.id, l.patron_id, l.patronName, l.contactInfo, l.bookId, l.issueDate, l.dueDate
+   FROM librarylog l WHERE l.bookId = ?",
+  's',
+  [$bookId]
+);
 
-if ($result->num_rows > 0) {
-  // output data of each row
-  while($row = $result->fetch_assoc()) {
-    $id = $row["id"];
-  	$patronName = $row["patronName"];
-  	$contactInfo = $row["contactInfo"];
-  	$issueDate = $row["issueDate"];
-  	$dueDate = $row["dueDate"];
+if ($row) {
+  $id = (int)$row['id'];
+  $patronId = (int)($row['patron_id'] ?? 0);
+  $selectedPatron = $patronId > 0 ? patron_get($mysqli, $patronId) : null;
+  if (!$selectedPatron) {
+    $selectedPatron = ['id' => 0, 'patronName' => $row['patronName'], 'contactInfo' => $row['contactInfo']];
   }
-  echo "
+  $issueDate = $row['issueDate'];
+  $dueDate = $row['dueDate'];
+  $bookId = $row['bookId'];
+?>
+<form class="form-horizontal text-start needs-validation" action="edit_complete.php" novalidate>
+<input type="hidden" name="log_id" value="<?= (int)$id ?>">
 
-<form class='form-horizontal text-start needs-validation' action='edit_complete.php' novalidate>
-
-<div class='form-floating mb-3'>
-  <input id='bookId' name='bookId' type='text' placeholder='Enter Book ID' class='form-control input-md' required='' value='" . h($bookId) . "'>
-  <label for='bookId'>Book ID</label>
+<div class="form-floating mb-3">
+  <input id="bookId" name="bookId" type="text" class="form-control input-md" required value="<?= h($bookId) ?>">
+  <label for="bookId">Book ID</label>
 </div>
 
-<div class='form-floating mb-3'>
-  <input id='patronName' name='patronName' type='text' placeholder='Enter Name' class='form-control input-md' required='' value='" . h($patronName) . "'>
-  <label for='patronName'>Name</label>
+<?php patron_render_picker('patronSearch', 'patron_id', $patronId > 0 ? $patronId : null, $selectedPatron); ?>
+
+<div class="form-floating mb-3">
+  <input id="issueDate" name="issueDate" type="date" class="form-control input-md" required value="<?= h($issueDate) ?>">
+  <label for="issueDate">Issue Date</label>
 </div>
 
-<div class='form-floating mb-3'>
-  <input id='contactInfo' name='contactInfo' type='text' placeholder='e.g. Phone Number, Parent Name, Class' class='form-control input-md' required='' value='" . h($contactInfo) . "'>
-  <label for='contactInfo'>Contact Info</label>
+<div class="form-floating mb-3">
+  <input id="dueDate" name="dueDate" type="date" class="form-control input-md" required value="<?= h($dueDate) ?>">
+  <label for="dueDate">Due Date</label>
 </div>
 
-<div class='form-floating mb-3'>
-  <input id='issueDate' name='issueDate' type='date' placeholder='Enter Date' class='form-control input-md' required='' value='" . h($issueDate) . "'>
-  <label for='issueDate'>Issue Date</label>
+<div class="form-group">
+  <button id="submit" name="submit" class="btn btn-orange" value="<?= (int)$id ?>">Edit</button>
 </div>
+</form>
+<?php patron_picker_script(); ?>
 
-<div class='form-floating mb-3'>
-  <input id='dueDate' name='dueDate' type='date' placeholder='Enter Date' class='form-control input-md' required='' value='" . h($dueDate) . "'>
-  <label for='dueDate'>Due Date</label>
-</div>
-
-<div class='form-group'>
-  <button id='submit' name='submit' class='btn btn-orange' value='" . (int)$id . "'>Edit</button>
-</div>
-
-</form>";
-
+<?php
 } else {
   echo "<h4>Does Not Exist</h4>";
 }
 ?>
 <hr>
-<button onclick="window.location.href='./index.php';" id="showlog" name="showlog" class="btn btn-orange">Return Home</button>
-
+<button onclick="window.location.href='./index.php';" class="btn btn-orange">Return Home</button>
 </div>
-<script type="text/javascript">
-  // Example starter JavaScript for disabling form submissions if there are invalid fields
-(() => {
-  'use strict'
-
-  // Fetch all the forms we want to apply custom Bootstrap validation styles to
-  const forms = document.querySelectorAll('.needs-validation')
-
-  // Loop over them and prevent submission
-  Array.from(forms).forEach(form => {
-    form.addEventListener('submit', event => {
-      if (!form.checkValidity()) {
-        event.preventDefault()
-        event.stopPropagation()
-      }
-
-      form.classList.add('was-validated')
-    }, false)
-  })
-})()
-</script>
 </body>

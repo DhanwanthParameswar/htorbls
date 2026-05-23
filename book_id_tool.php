@@ -3,10 +3,12 @@ require_once __DIR__ . '/includes/auth.php';
 bls_require_auth();
 include "bootstrap.php";
 include "db_connect.php";
+require_once __DIR__ . '/includes/patrons.php';
 $sql = "UPDATE librarylog SET fineAmount = CEIL(GREATEST(DATEDIFF(CURRENT_DATE, `dueDate`), 0)/7)*0.25";
 $result = $mysqli->query($sql);
 ?>
 <title>HTOR BLS - Book ID Tool</title>
+</head>
 <body style="width: 100%; min-height: 100vh; display: -webkit-box; display: -webkit-flex; display: -moz-box; display: -ms-flexbox; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; padding: 15px; background: #F4CABC;">
     <div class="container text-center" style="width: 750px; background: #fff; border-radius: 10px; overflow: hidden; padding: 33px 55px 33px 55px; box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -moz-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -o-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1); -ms-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.1);">
       <h1 class="text-center pb-2 display-4">Book ID Tool</h1>
@@ -15,7 +17,12 @@ $bookId = normalize_book_id($_GET["bookId"] ?? '');
 
 echo "<h4>Entry for <b>" . h($bookId) . "</b></h4>";
 
-$result = db_select($mysqli, "SELECT patronName, contactInfo, issueDate, dueDate, fineAmount FROM librarylog WHERE bookId = ?", 's', [$bookId]);
+$result = db_select($mysqli,
+  "SELECT l.patron_id, " . patron_select_name_sql('l') . ", " . patron_select_contact_sql('l') . ",
+   l.issueDate, l.dueDate, l.fineAmount FROM librarylog l " . patron_log_display_join_sql('l') . " WHERE l.bookId = ?",
+  's',
+  [$bookId]
+);
 $result2 = db_select($mysqli, "SELECT bookName, bookCategory, additionalNotes FROM booklist WHERE bookId = ?", 's', [$bookId]);
 
 if ($result && $result2 && $result->num_rows > 0 && $result2->num_rows > 0) {
@@ -55,7 +62,9 @@ if ($result && $result2 && $result->num_rows > 0 && $result2->num_rows > 0) {
 
     <ul class='list-group list-group-horizontal'>
       <li class='list-group-item'>Patron Name</li>
-      <li class='list-group-item'>" .$row['patronName']. "</li>
+      <li class='list-group-item'>" . (!empty($row['patron_id'])
+        ? "<a href='patron.php?id=" . (int)$row['patron_id'] . "'>" . h($row['patronName']) . "</a>"
+        : h($row['patronName'])) . "</li>
     </ul>
     <ul class='list-group list-group-horizontal'>
       <li class='list-group-item'>Contact Info</li>

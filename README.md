@@ -10,6 +10,7 @@ Web app for managing the **Balvihar Library** at the [Hindu Temple of Rochester]
 - **Book catalog** — Add/edit books with categories, notes, and cover images
 - **Book ID tool** — Lookup, renew, return by book ID
 - **Archive** — Returned items (last 6 months shown by default)
+- **Patron registry** — Searchable patrons, checkout by patron, history per patron
 - **Authentication** — Session-based login with bcrypt passwords
 
 ## Requirements
@@ -93,6 +94,9 @@ INSERT INTO users (username, password) VALUES ('librarian', '<hash-from-above>')
 ├── login.php / auth.php   # Authentication
 ├── library_log.php        # Active checkouts
 ├── library_archive.php    # Returned items
+├── patrons.php            # Patron list
+├── patron.php             # Patron detail (books out + history)
+├── patron_edit.php        # Add / edit patron
 ├── book_list.php          # Catalog
 ├── new_entry.php          # Checkout flow
 ├── book_id_tool*.php      # Lookup / renew / return

@@ -23,6 +23,7 @@ function bls_render_main_nav(?string $active = null): void {
     'log' => ['href' => 'library_log.php', 'label' => 'Log'],
     'archive' => ['href' => 'library_archive.php', 'label' => 'Archive'],
     'book_list' => ['href' => 'book_list.php', 'label' => 'Book List'],
+    'patrons' => ['href' => 'patrons.php', 'label' => 'Patrons'],
     'analytics' => ['href' => 'analytics.php', 'label' => 'Analytics'],
   ];
   $first = true;
@@ -40,8 +41,14 @@ function bls_render_subpage_toolbar(?string $active = null): void {
   ?>
   <button onclick="window.location.href='./index.php';" class="btn btn-orange mb-3">Return Home</button>
   <?php
-  $analyticsClass = ($active === 'analytics') ? 'btn btn-orange mb-3 active' : 'btn btn-orange mb-3';
-  ?>
-  <button onclick="window.location.href='./analytics.php';" class="<?= $analyticsClass ?>">Analytics</button>
-  <?php
+  if ($active !== 'patrons') {
+    ?>
+  <button onclick="window.location.href='./patrons.php';" class="btn btn-orange mb-3">Patrons</button>
+    <?php
+  }
+  if ($active !== 'analytics') {
+    ?>
+  <button onclick="window.location.href='./analytics.php';" class="btn btn-orange mb-3">Analytics</button>
+    <?php
+  }
 }

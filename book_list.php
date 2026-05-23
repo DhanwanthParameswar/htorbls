@@ -7,21 +7,8 @@ require_once __DIR__ . '/includes/layout.php';
 $sql = "UPDATE librarylog SET fineAmount = CEIL(GREATEST(DATEDIFF(CURRENT_DATE, `dueDate`), 0)/7)*0.25";
 $result = $mysqli->query($sql);
 ?>
-<head>
-  <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.bootstrap5.css">
+<?php require_once __DIR__ . '/includes/datatables_head.php'; ?>
 <title>HTOR BLS - Book List</title>
-<style type="text/css">
-  .buttons-html5, .buttons-print, .buttons-page-length {
-    padding: 5px;
-    margin: 5px;
-    box-shadow: none;
-    border-radius: 5px !important;
-    border: 1px solid #dee2e6;
-    background-color: #fff;
-    color: #000;
-  }
-</style>
 </head>
 
   <div class="modal fade" id="reg-modal" tabindex="-1" aria-labelledby="modal-title" aria-hidden="true">
@@ -55,7 +42,7 @@ $result = $mysqli->query($sql);
       <th>Book Name</th>
       <th>Book Category</th>
       <th>Additional Notes</th>
-      <th>Quick Tools</th>
+      <th class="bls-quick-tools-cell">Quick Tools</th>
     </tr>
   </thead>
   <tbody>
@@ -79,24 +66,15 @@ if ($result->num_rows > 0) {
   // output data of each row
   while($row = $result->fetch_assoc()) {
     $bookId = $row['bookId'];
-    echo "<tr><td>". $row["bookId"] ."</td><td>". $row["bookName"] ."</td><td>". $row["bookCategory"] ."</td><td>". $row["additionalNotes"] ."</td><td>". "
-      <div class='btn-group' role='group'>
-
+    echo "<tr><td>". $row["bookId"] ."</td><td>". $row["bookName"] ."</td><td>". $row["bookCategory"] ."</td><td>". $row["additionalNotes"] ."</td><td class='bls-quick-tools-cell'><div class='bls-quick-tools' role='group'>
       <form action='book_id_tool.php'>
-      <button id='bookId' name='bookId' class='btn btn-orange btn-sm' value='$bookId'><i class='bi bi-tools'></i></button>
+      <button type='submit' id='bookId' name='bookId' class='btn btn-orange btn-sm' value='$bookId' title='Book ID tool'><i class='bi bi-tools'></i></button>
       </form>
-
-      &nbsp;
-
       <form action='edit_book.php'>
-      <button id='edit' name='edit' class='btn btn-orange btn-sm' value='$bookId'><i class='bi bi-pencil-square'></i></button>
+      <button type='submit' id='edit' name='edit' class='btn btn-orange btn-sm' value='$bookId' title='Edit book'><i class='bi bi-pencil-square'></i></button>
       </form>
-
-      &nbsp;
-
-      <button class='delete-click btn btn-danger btn-sm' data-id='$bookId' data-bs-toggle='modal' data-bs-target='#reg-modal'><i class='bi bi-trash-fill'></i></button>
-
-      </div>" ."</td></tr>";
+      <button type='button' class='delete-click btn btn-danger btn-sm' data-id='$bookId' data-bs-toggle='modal' data-bs-target='#reg-modal' title='Delete'><i class='bi bi-trash-fill'></i></button>
+      </div></td></tr>";
   }
 }
 }
@@ -105,8 +83,6 @@ echo "</table>";
 echo "</div>";
 ?>
 
-<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
 <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
 <script src="https://cdn.datatables.net/buttons/3.1.2/js/dataTables.buttons.js"></script>
@@ -123,9 +99,7 @@ $(document).on("click", ".delete-click", function () {
 });
 
 $('#example').DataTable( {
-  columnDefs: [
-    { orderable: false, targets: 4 }
-  ],
+  columnDefs: [{ orderable: false, targets: 'bls-quick-tools-cell' }],
   order: [[1, 'asc']],
       layout: {
         topStart: {
